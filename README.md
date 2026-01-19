@@ -52,7 +52,7 @@ Make sure you have a vector-capable Astra database (get one for free at [astra.d
 
     *(Optional: If you need a service instance, create a new instance of "watsonx.ai" in the IBM Cloud console and bind it to your project.)*
 
-    *(You may also need to enable the appropriate LLM model in your project, such as `ibm/granite-3-3-8b-instruct` or similar.)*
+    *(You may also need to enable the appropriate LLM model in your project, such as `meta-llama/llama-4-maverick-17b-128e-instruct-fp8` or similar.)*
 
 ### Get access to Langflow
 There are several ways to gain access to Langflow. Pick the one that suits you best 😊:
@@ -155,7 +155,7 @@ Click the magnifying glass `🔍` in the `watsonx.ai` component. This shows you 
 #### Steps:
 1. Reproduce the above flow (or load it from [./flows/basic-agentic-ai.json](./flows/basic-agentic-ai.json))
 2. For watsonx.ai, ensure that the `API Endpoint`, `Project ID` and `API Key` have been set correctly. Also make sure the output is set to `Language Model`.
-3. Ensure the model is set to a chat-capable model, such as `mistralai/mistral-large`
+3. Ensure the model is set to a chat-capable model, such as `meta-llama/llama-4-maverick-17b-128e-instruct-fp8`
 4. When adding the `URL` and `Calculator` components to the canvas, select them and click `Tool mode`
 5. Connect all the components
 
