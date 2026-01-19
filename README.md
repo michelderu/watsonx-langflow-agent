@@ -63,7 +63,7 @@ There are several ways to gain access to Langflow. Pick the one that suits you b
 ### ⚡️ Open this tutorial on Github Codespaces
 To make life easier, we'll use the awesome Github Codespace functionality. Github offers you a smooth cloud-based developer experience to get started quickly. How?
 
-1. Open the [watsonx-langflow-agent](https://github.com/michelderu/watsonx-langflow-agent) repository
+1. Open the [watsonx-langflow-agent](https://github.com/difli/watsonx-langflow-agent) repository
 2. Click on `Use this template`->`Open in a codespace` as follows:
 
     ![github-open-in-codespace](./assets/github-open-in-codespace.png)
@@ -257,13 +257,13 @@ Browse back to Langflow, click on `▶️ Playground` and click on `+` on the le
 1. Browse to your `support_agent` database on [Astra DB](https://astra.datastax.com)
 2. Click `Data Explorer` and click `Create Collection +`
 3. Name the collection `orders`, disable the `Vector-enabled collection` switch and click `Create Collection`
-4. Click `Load Data` and upload the file: [./data/sample_orders.csv](./sample_orders.csv)
+4. Click `Load Data` and upload the file: [./data/sample_orders.csv](./data/sample_orders.csv)
 5. Verify the data was loaded into Astra DB
 
 #### Preparation: Add Products data
 1. Click `Create Collection +`
 2. Name the collection `products`, disable the `Vector-enabled collection` switch and click `Create Collection`
-3. Click `Load Data` and upload the file: [./data/sample_products.csv](./sample_products.csv)
+3. Click `Load Data` and upload the file: [./data/sample_products.csv](./data/sample_products.csv)
 4. Verify the data was loaded into Astra DB
 
 #### Steps 🛠️🔍: Add Order Lookup to the agent 
@@ -342,8 +342,9 @@ In this step we'll create a simple Python app that runs the Langflow flow.
     ![langflow-python-api](./assets/langflow-python-api.png)
 
 3. Copy the code, use your Codespaces cloud IDE and paste it in a new file called `flow.py`
-    - Change the `url` variable on line to 10 to `http://localhost:7860`, make sure to keep the full path (`/api/...`)!
-    - Change the `input_value` variable on line 16 to something like '*How can I cancel order 1001 and what is the shipping policy?*'
+    - Change the `url` variable on line to 5 to `http://localhost:7860`, make sure to keep the full path (`/api/...`)!
+    - Change the `input_value` variable on line 11 to something like '*How can I cancel order 1001 and what is the shipping policy?*'
+    - On line 15 add: headers = {'x-api-key': 'YOUR-API-KEY, 'Content-Type': 'application/json'}
 5. Save the file
 6. In the same API Access window in Langflow now click the `create and API key` link
 7. In the new window, click `+ Add New`, type a description (e.g. Support Agent) and click `Generate API Key`
