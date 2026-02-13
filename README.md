@@ -17,7 +17,7 @@ By the end of the workshop you've learned:
 3. How to use **watsonx.ai** to use foundational models (LLMs)
 4. How to use **Langflow** to create **intelligent agents** utilizing multiple tools
 5. How to utilise the Customer Support Agent flow in a **customer facing app**
-6. How to publish the Customer Support agent as an **MCP server** and use it in Claude desktop
+6. How to publish the Customer Support agent as an **MCP server** and use it in Claude desktop and in **watsonx Orchestrate**.
 
 ## 🛠️ Prerequisites
 This workshop assumes you have access to:
@@ -52,7 +52,7 @@ Make sure you have a vector-capable Astra database (get one for free at [astra.d
 
     *(Optional: If you need a service instance, create a new instance of "watsonx.ai" in the IBM Cloud console and bind it to your project.)*
 
-    *(You may also need to enable the appropriate LLM model in your project, such as `ibm/granite-3-3-8b-instruct` or similar.)*
+    *(You may also need to enable the appropriate LLM model in your project, such as `meta-llama/llama-4-maverick-17b-128e-instruct-fp8` or similar.)*
 
 ### Get access to Langflow
 There are several ways to gain access to Langflow. Pick the one that suits you best 😊:
@@ -63,7 +63,7 @@ There are several ways to gain access to Langflow. Pick the one that suits you b
 ### ⚡️ Open this tutorial on Github Codespaces
 To make life easier, we'll use the awesome Github Codespace functionality. Github offers you a smooth cloud-based developer experience to get started quickly. How?
 
-1. Open the [watsonx-langflow-agent](https://github.com/michelderu/watsonx-langflow-agent) repository
+1. Open the [watsonx-langflow-agent](https://github.com/difli/watsonx-langflow-agent) repository
 2. Click on `Use this template`->`Open in a codespace` as follows:
 
     ![github-open-in-codespace](./assets/github-open-in-codespace.png)
@@ -105,7 +105,7 @@ To make life easier, we'll use the awesome Github Codespace functionality. Githu
 
     ⚠️ Ensure the Port Visibility is set to Public, especially important for the MCP server part later on in this tutorial!
 
-    ![codespace-public-port](./assets/public-port.png)
+    ![codespace-public-port](./assets/codespace-public-port.png)
 
 🎉 Congrats! You finished the set-up part of the workshop. Now for the fun part!
 
@@ -155,7 +155,7 @@ Click the magnifying glass `🔍` in the `watsonx.ai` component. This shows you 
 #### Steps:
 1. Reproduce the above flow (or load it from [./flows/basic-agentic-ai.json](./flows/basic-agentic-ai.json))
 2. For watsonx.ai, ensure that the `API Endpoint`, `Project ID` and `API Key` have been set correctly. Also make sure the output is set to `Language Model`.
-3. Ensure the model is set to a chat-capable model, such as `meta/meta-llama-3-3-70b-instruct`
+3. Ensure the model is set to a chat-capable model, such as `meta-llama/llama-4-maverick-17b-128e-instruct-fp8`
 4. When adding the `URL` and `Calculator` components to the canvas, select them and click `Tool mode`
 5. Connect all the components
 
@@ -257,13 +257,13 @@ Browse back to Langflow, click on `▶️ Playground` and click on `+` on the le
 1. Browse to your `support_agent` database on [Astra DB](https://astra.datastax.com)
 2. Click `Data Explorer` and click `Create Collection +`
 3. Name the collection `orders`, disable the `Vector-enabled collection` switch and click `Create Collection`
-4. Click `Load Data` and upload the file: [./data/sample_orders.csv](./sample_orders.csv)
+4. Click `Load Data` and upload the file: [./data/sample_orders.csv](./data/sample_orders.csv)
 5. Verify the data was loaded into Astra DB
 
 #### Preparation: Add Products data
 1. Click `Create Collection +`
 2. Name the collection `products`, disable the `Vector-enabled collection` switch and click `Create Collection`
-3. Click `Load Data` and upload the file: [./data/sample_products.csv](./sample_products.csv)
+3. Click `Load Data` and upload the file: [./data/sample_products.csv](./data/sample_products.csv)
 4. Verify the data was loaded into Astra DB
 
 #### Steps 🛠️🔍: Add Order Lookup to the agent 
@@ -342,8 +342,9 @@ In this step we'll create a simple Python app that runs the Langflow flow.
     ![langflow-python-api](./assets/langflow-python-api.png)
 
 3. Copy the code, use your Codespaces cloud IDE and paste it in a new file called `flow.py`
-    - Change the `url` variable on line to 10 to `http://localhost:7860`, make sure to keep the full path (`/api/...`)!
-    - Change the `input_value` variable on line 16 to something like '*How can I cancel order 1001 and what is the shipping policy?*'
+    - Change the `url` variable on line to 5 to `http://localhost:7860`, make sure to keep the full path (`/api/...`)!
+    - Change the `input_value` variable on line 11 to something like '*How can I cancel order 1001 and what is the shipping policy?*'
+    - On line 15 add: headers = {'x-api-key': 'YOUR-API-KEY, 'Content-Type': 'application/json'}
 5. Save the file
 6. In the same API Access window in Langflow now click the `create and API key` link
 7. In the new window, click `+ Add New`, type a description (e.g. Support Agent) and click `Generate API Key`
@@ -433,3 +434,70 @@ Claude will ask you for approval to invoke the Customer Support Agent tool and y
 ```sh
 npx @modelcontextprotocol/inspector
 ```
+
+## 8. ✨ Integrate with watsonx Orchestrate
+This section provides a step-by-step visual walkthrough for integrating the agentic flow you built in Langflow as a callable tool within your local **IBM watsonx Orchestrate** environment.
+
+By leveraging the Model Context Protocol (MCP) server built into Langflow, you can expose complex, multi-step agents as a single, powerful tool that Orchestrate can use.
+
+### Prerequisites
+
+Before you begin, ensure you have the following components set up and running:
+
+1.  **A Running Local watsonx Orchestrate Instance**: As set up by the [`wxo-adk-on-colima`](https://github.com/difli/wxo-adk-on-colima) project.
+2.  **A Running Langflow Instance**: Your Langflow environment must be running and publicly accessible (e.g., via GitHub Codespaces), with the MCP Server URL and an API Key generated.
+3.  **A Completed Langflow Flow**: A functional flow in Langflow that you want to expose as a tool (like the one created in the previous steps).
+
+### Integration Workflow: A UI-Only Guide
+
+Follow these visual steps to import your Langflow flow and see it working in Orchestrate.
+
+#### Step 1: Begin Importing a New Tool
+
+The process starts from the Orchestrate App Builder UI, where you add a new skill to an agent.
+
+1.  From the agent's **Toolset** page, click the **Add tool** button.
+2.  From the "Add a new tool" dialog, select the **Import** option to connect to an external tool.
+
+    ![Choosing to import a new tool](./assets/orchestrate-import-command.png)
+
+#### Step 2: Select MCP Server Import
+
+Orchestrate provides multiple ways to import a tool.
+
+1.  In the next dialog, select **Import from MCP server** to connect to a live endpoint like the one provided by Langflow.
+
+    ![Adding a new MCP server](./assets/orchestrate-import-mcp.png)
+
+#### Step 3: Add the Langflow MCP Server
+
+Before you can import the tool, you must first register your Langflow MCP server with Orchestrate.
+
+1.  From the "Import or remove tools" screen, click **Add MCP server**.
+
+    ![Selecting the MCP server import option](./assets/orchestrate-import-mcp-create.png)
+
+2.  In the "Add MCP Server" dialog, configure the connection:
+    *   Give your server a memorable **Server name**, like `langflow`.
+    *   In the **Install command** field, paste the `uvx mcp-proxy` command containing the URL and API key you obtained from the Langflow UI. This is how Orchestrate securely connects to your Langflow instance.
+    *   Use the following command, replacing the URL and API key with your URL and API key:
+        ```sh
+        uvx mcp-proxy --headers x-api-key sk-64-8IZMyZKkqpi3J9I1jBv6GgI6YYCfdTV5v7hZi_q0 https://glorious-waffle-g9gp7p4x45hwwpj-7860.app.github.dev/api/v1/mcp/project/612ee268-43ee-45ee-b745-0ce944ed84b1/sse
+        ```
+    *   Click **Connect**.
+
+    <img src="./assets/orchestrate-add-mcp.png" alt="Configuring the Langflow MCP server connection details" width="300">
+
+#### Step 4: Verify and Use the New Skill
+
+Once the MCP server is connected and the tool is imported, it will appear in your agent's **Toolset**.
+
+1.  The `SupportAgent:customer_support_agent` tool is now listed, ready to be used.
+2.  You can test it immediately in the **Preview chat panel**. Ask a question that requires the Langflow agent to act, for example:
+    > "What is the status of order 1001?"
+
+The Orchestrate agent will now delegate the task to your Langflow agent, which will execute its flow and return the final answer directly in the chat.
+
+![The integrated Langflow agent successfully answers a question in the Orchestrate chat UI](./assets/orchestrate-chat.png)
+
+Congratulations! You have successfully integrated a powerful, custom Langflow agent into watsonx Orchestrate using only the user interface.
