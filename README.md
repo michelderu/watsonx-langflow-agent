@@ -95,6 +95,14 @@ To make life easier, we'll use the awesome Github Codespace functionality. Githu
 
     This starts Langflow and opens a port to your Codespace in the cloud. Click `Make Public` to ensure you can access Langflow from anywhere on the internet.
 
+    In case you want access to the Docling API:
+    ```bash
+    docker run -p 5001:5001 quay.io/docling-project/docling-serve
+    docker run -p 5001:5001 -e DOCLING_SERVE_ENABLE_UI=true quay.io/docling-project/docling-serve
+
+    ```
+    And navigate to http://localhost:5001/ui
+
     ![codespace-forward-port](./assets/codespace-forward-port.png)
 
     Now navigate to `PORTS` which shows you all forwarded ports from the Codespace, click on the `Forwarded Address` for Langflow and click the globe icon to open Langflow in a browser
